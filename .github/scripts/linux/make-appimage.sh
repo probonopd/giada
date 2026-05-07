@@ -47,7 +47,10 @@ chmod +x "$APPDIR/AppRun"
 cp extras/com.giadamusic.Giada.desktop "$APPDIR/"
 cp extras/giada-logo.png "$APPDIR/.DirIcon"
 
-RELEASE_JSON="$(curl -fsSL https://api.github.com/repos/AppImage/appimagetool/releases/tags/continuous)"
+RELEASE_JSON="$(curl -fSL https://api.github.com/repos/AppImage/appimagetool/releases/tags/continuous)" || {
+    echo "Failed to fetch appimagetool release metadata"
+    exit 1
+}
 EXPECTED_DIGEST="$(python3 -c 'import json,sys
 arch=sys.argv[1]
 asset_name=f"appimagetool-{arch}.AppImage"
@@ -66,7 +69,10 @@ if [ -z "$EXPECTED_DIGEST" ]; then
     exit 1
 fi
 
-curl -fsSL -o "$APPIMAGE_TOOL" "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${ARCH}.AppImage"
+curl -fSL -o "$APPIMAGE_TOOL" "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${ARCH}.AppImage" || {
+    echo "Failed to download appimagetool for $ARCH"
+    exit 1
+}
 DOWNLOADED_DIGEST="$(sha256sum "$APPIMAGE_TOOL" | awk '{print $1}')"
 if [ "$DOWNLOADED_DIGEST" != "$EXPECTED_DIGEST" ]; then
     echo "appimagetool digest mismatch for $ARCH"
