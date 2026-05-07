@@ -49,6 +49,10 @@
         {
             "name": "libsndfile",
             "version": "1.2.2"
+        },
+        {
+            "name": "alsa",
+            "version": "1.2.15.3"
         }
     ]
 }
