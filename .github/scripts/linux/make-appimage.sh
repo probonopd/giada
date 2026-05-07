@@ -36,7 +36,7 @@ mkdir -p "$APPDIR/usr/share/icons/hicolor/scalable/apps"
 cp build/giada "$APPDIR/usr/bin/giada"
 cp extras/com.giadamusic.Giada.desktop "$APPDIR/usr/share/applications/"
 cp extras/com.giadamusic.Giada.metainfo.xml "$APPDIR/usr/share/metainfo/"
-cp extras/giada-logo.svg "$APPDIR/usr/share/icons/hicolor/scalable/apps/com.giadamusic.Giada.svg"
+cp extras/giada-logo.svg "$APPDIR/usr/share/icons/hicolor/scalable/apps/giada.svg"
 
 cat << 'EOF' > "$APPDIR/AppRun"
 #!/bin/sh
@@ -96,7 +96,7 @@ chmod +x "$LINUXDEPLOY_TOOL"
 ARCH="$ARCH" APPIMAGE_EXTRACT_AND_RUN=1 "$LINUXDEPLOY_TOOL" \
     --appdir "$APPDIR" \
     --desktop-file extras/com.giadamusic.Giada.desktop \
-    --icon-file extras/giada-logo.svg \
+    --icon-file "$APPDIR/usr/share/icons/hicolor/scalable/apps/giada.svg" \
     --executable "$APPDIR/usr/bin/giada" \
     --output appimage
 
