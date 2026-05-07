@@ -13,6 +13,7 @@ APPDIR="temp/AppDir"
 APPIMAGE_TOOL="temp/appimagetool.AppImage"
 OUTPUT="dist/giada-${BUILD_ID}-${ARCH}-linux.AppImage"
 MIN_SIZE=$((5 * 1024 * 1024))
+GITHUB_API_URL="https://api.github.com/repos/AppImage/appimagetool/releases/tags/continuous"
 
 if [ "$ARCH" != "x86_64" ] && [ "$ARCH" != "aarch64" ]; then
     echo "Unsupported arch: $ARCH"
@@ -47,7 +48,12 @@ chmod +x "$APPDIR/AppRun"
 cp extras/com.giadamusic.Giada.desktop "$APPDIR/"
 cp extras/giada-logo.png "$APPDIR/.DirIcon"
 
-RELEASE_JSON="$(curl -fSL https://api.github.com/repos/AppImage/appimagetool/releases/tags/continuous)" || {
+AUTH_HEADER=()
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+    AUTH_HEADER=(-H "Authorization: Bearer ${GITHUB_TOKEN}")
+fi
+
+RELEASE_JSON="$(curl -fSL "${AUTH_HEADER[@]}" "$GITHUB_API_URL")" || {
     echo "Failed to fetch appimagetool release metadata"
     exit 1
 }
@@ -89,7 +95,10 @@ chmod +x "$APPIMAGE_TOOL"
 
 ARCH="$ARCH" APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGE_TOOL" --no-appstream "$APPDIR" "$OUTPUT"
 
-APPIMAGE_SIZE=$(stat -c%s "$OUTPUT")
+APPIMAGE_SIZE=$(stat -c%s "$OUTPUT") || {
+    echo "Failed to read AppImage size: $OUTPUT"
+    exit 1
+}
 if [ "$APPIMAGE_SIZE" -lt "$MIN_SIZE" ]; then
     echo "AppImage too small: ${APPIMAGE_SIZE} bytes (< ${MIN_SIZE})"
     exit 1
