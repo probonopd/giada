@@ -20,14 +20,14 @@
         },
         {
             "name": "libsndfile",
-            "platform": "!arm",
+            "platform": "!arm & !arm64",
             "features": [
                 "external-libs"
             ]
         },
         {
             "name": "libsndfile",
-            "platform": "arm",
+            "platform": "arm | arm64",
             "default-features": false
         }
     ],
