@@ -1,6 +1,6 @@
 name: Continuous integration
 
-# Runs on push and pull requests, any branch, Linux only (for now).
+# Runs on push and pull requests on any branch.
 
 on: [push, pull_request, workflow_dispatch]
 
