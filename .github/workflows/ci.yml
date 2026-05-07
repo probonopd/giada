@@ -34,7 +34,7 @@ jobs:
   linux-appimage:
     name: Linux AppImage (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -59,7 +59,7 @@ jobs:
         run: cmake --build build/ -j 3
 
       - name: Make AppImage
-        run: bash ./.github/scripts/linux/make-appimage.sh ${{ github.ref_name }} ${{ matrix.arch }}
+        run: bash ./.github/scripts/linux/make-appimage.sh ${{ github.sha }} ${{ matrix.arch }}
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4

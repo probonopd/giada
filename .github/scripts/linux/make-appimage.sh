@@ -7,7 +7,7 @@ if [ -z "${1:-}" ] || [ -z "${2:-}" ]; then
     exit 1
 fi
 
-RELEASE_VERSION="$(echo "$1" | tr -cs '[:alnum:]._-+' '-')"
+RELEASE_VERSION="$1"
 ARCH="$2"
 APPDIR="temp/AppDir"
 APPIMAGE_TOOL="temp/appimagetool.AppImage"
@@ -16,6 +16,11 @@ MIN_SIZE=$((5 * 1024 * 1024))
 
 if [ "$ARCH" != "x86_64" ] && [ "$ARCH" != "aarch64" ]; then
     echo "Unsupported arch: $ARCH"
+    exit 1
+fi
+
+if [[ ! "$RELEASE_VERSION" =~ ^[[:alnum:]._-]+$ ]]; then
+    echo "Unsupported release version format: $RELEASE_VERSION"
     exit 1
 fi
 
