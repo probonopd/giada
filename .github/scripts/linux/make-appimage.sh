@@ -3,15 +3,15 @@
 set -euo pipefail
 
 if [ -z "${1:-}" ] || [ -z "${2:-}" ]; then
-    echo "Usage: make-appimage.sh [release-version] [x86_64|aarch64]"
+    echo "Usage: make-appimage.sh [build-id] [x86_64|aarch64]"
     exit 1
 fi
 
-RELEASE_VERSION="$1"
+BUILD_ID="$1"
 ARCH="$2"
 APPDIR="temp/AppDir"
 APPIMAGE_TOOL="temp/appimagetool.AppImage"
-OUTPUT="dist/giada-${RELEASE_VERSION}-${ARCH}-linux.AppImage"
+OUTPUT="dist/giada-${BUILD_ID}-${ARCH}-linux.AppImage"
 MIN_SIZE=$((5 * 1024 * 1024))
 
 if [ "$ARCH" != "x86_64" ] && [ "$ARCH" != "aarch64" ]; then
@@ -19,8 +19,8 @@ if [ "$ARCH" != "x86_64" ] && [ "$ARCH" != "aarch64" ]; then
     exit 1
 fi
 
-if [[ ! "$RELEASE_VERSION" =~ ^[[:alnum:]._-]+$ ]]; then
-    echo "Unsupported release version format: $RELEASE_VERSION"
+if [[ ! "$BUILD_ID" =~ ^[[:alnum:]._-]+$ ]]; then
+    echo "Unsupported build id format: $BUILD_ID"
     exit 1
 fi
 
@@ -47,7 +47,34 @@ chmod +x "$APPDIR/AppRun"
 cp extras/com.giadamusic.Giada.desktop "$APPDIR/"
 cp extras/giada-logo.png "$APPDIR/.DirIcon"
 
-curl -sSL -o "$APPIMAGE_TOOL" "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${ARCH}.AppImage"
+RELEASE_JSON="$(curl -fsSL https://api.github.com/repos/AppImage/appimagetool/releases/tags/continuous)"
+EXPECTED_DIGEST="$(python3 -c 'import json,sys
+arch=sys.argv[1]
+asset_name=f"appimagetool-{arch}.AppImage"
+release=json.load(sys.stdin)
+for asset in release.get("assets", []):
+    if asset.get("name")==asset_name:
+        digest=asset.get("digest","")
+        if digest.startswith("sha256:"):
+            print(digest.split(":",1)[1])
+            raise SystemExit(0)
+print("")
+' "$ARCH" <<< "$RELEASE_JSON")"
+
+if [ -z "$EXPECTED_DIGEST" ]; then
+    echo "Unable to determine appimagetool digest for $ARCH"
+    exit 1
+fi
+
+curl -fsSL -o "$APPIMAGE_TOOL" "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${ARCH}.AppImage"
+DOWNLOADED_DIGEST="$(sha256sum "$APPIMAGE_TOOL" | awk '{print $1}')"
+if [ "$DOWNLOADED_DIGEST" != "$EXPECTED_DIGEST" ]; then
+    echo "appimagetool digest mismatch for $ARCH"
+    echo "expected: $EXPECTED_DIGEST"
+    echo "actual:   $DOWNLOADED_DIGEST"
+    exit 1
+fi
+
 chmod +x "$APPIMAGE_TOOL"
 
 ARCH="$ARCH" APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGE_TOOL" --no-appstream "$APPDIR" "$OUTPUT"
