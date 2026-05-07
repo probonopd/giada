@@ -49,7 +49,7 @@ jobs:
       matrix:
         include:
           - arch: x86_64
-            runner: ubuntu-20.04
+            runner: ubuntu-24.04
             cc: gcc
             cxx: g++
           # Oldest currently available Ubuntu arm64 hosted runner label.
