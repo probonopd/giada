@@ -1,7 +1,0 @@
-Package: libsndfile
-Feature: external-libs
-Depends: libflac, libvorbis, opus
-Architecture: x64-linux
-Multi-Arch: same
-Description: Enable FLAC, Vorbis, and Opus codecs
-Status: install ok installed

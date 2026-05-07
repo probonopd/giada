@@ -10,10 +10,10 @@ fi
 BUILD_ID="$1"
 ARCH="$2"
 APPDIR="temp/AppDir"
-APPIMAGE_TOOL="temp/appimagetool.AppImage"
+LINUXDEPLOY_TOOL="temp/linuxdeploy.AppImage"
 OUTPUT="dist/giada-${BUILD_ID}-${ARCH}-linux.AppImage"
 MIN_SIZE=$((5 * 1024 * 1024))
-GITHUB_API_URL="https://api.github.com/repos/AppImage/appimagetool/releases/tags/continuous"
+GITHUB_API_URL="https://api.github.com/repos/linuxdeploy/linuxdeploy/releases/tags/continuous"
 
 if [ "$ARCH" != "x86_64" ] && [ "$ARCH" != "aarch64" ]; then
     echo "Unsupported arch: $ARCH"
@@ -54,12 +54,12 @@ if [ -n "${GITHUB_TOKEN:-}" ]; then
 fi
 
 RELEASE_JSON="$(curl -fSL "${AUTH_HEADER[@]}" "$GITHUB_API_URL")" || {
-    echo "Failed to fetch appimagetool release metadata"
+    echo "Failed to fetch linuxdeploy release metadata"
     exit 1
 }
 EXPECTED_DIGEST="$(python3 -c 'import json,sys
 arch=sys.argv[1]
-asset_name=f"appimagetool-{arch}.AppImage"
+asset_name=f"linuxdeploy-{arch}.AppImage"
 release=json.load(sys.stdin)
 for asset in release.get("assets", []):
     if asset.get("name") == asset_name:
@@ -72,28 +72,36 @@ for asset in release.get("assets", []):
 print(f"Asset not found: {asset_name}", file=sys.stderr)
 raise SystemExit(1)
 ' "$ARCH" <<< "$RELEASE_JSON")" || {
-    echo "Unable to determine appimagetool digest for $ARCH"
+    echo "Unable to determine linuxdeploy digest for $ARCH"
     exit 1
 }
 
-curl -fSL -o "$APPIMAGE_TOOL" "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${ARCH}.AppImage" || {
-    echo "Failed to download appimagetool for $ARCH"
+curl -fSL -o "$LINUXDEPLOY_TOOL" "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage" || {
+    echo "Failed to download linuxdeploy for $ARCH"
     exit 1
 }
-DOWNLOADED_DIGEST="$(sha256sum "$APPIMAGE_TOOL" | awk '{print $1}')" || {
-    echo "Failed to calculate digest for downloaded appimagetool"
+DOWNLOADED_DIGEST="$(sha256sum "$LINUXDEPLOY_TOOL" | awk '{print $1}')" || {
+    echo "Failed to calculate digest for downloaded linuxdeploy"
     exit 1
 }
 if [ "$DOWNLOADED_DIGEST" != "$EXPECTED_DIGEST" ]; then
-    echo "appimagetool digest mismatch for $ARCH"
+    echo "linuxdeploy digest mismatch for $ARCH"
     echo "expected: $EXPECTED_DIGEST"
     echo "actual:   $DOWNLOADED_DIGEST"
     exit 1
 fi
 
-chmod +x "$APPIMAGE_TOOL"
+chmod +x "$LINUXDEPLOY_TOOL"
 
-ARCH="$ARCH" APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGE_TOOL" --no-appstream "$APPDIR" "$OUTPUT"
+ARCH="$ARCH" APPIMAGE_EXTRACT_AND_RUN=1 "$LINUXDEPLOY_TOOL" \
+    --appdir "$APPDIR" \
+    --desktop-file extras/com.giadamusic.Giada.desktop \
+    --icon-file extras/giada-logo.svg \
+    --executable "$APPDIR/usr/bin/giada" \
+    --output appimage
+
+GENERATED_APPIMAGE="$(ls -1 ./*.AppImage | head -n 1)"
+mv "$GENERATED_APPIMAGE" "$OUTPUT"
 
 APPIMAGE_SIZE=$(stat -c%s "$OUTPUT") || {
     echo "Failed to read AppImage size: $OUTPUT"
