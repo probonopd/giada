@@ -67,7 +67,7 @@ for asset in release.get("assets", []):
         if digest.startswith("sha256:"):
             print(digest.split(":", 1)[1])
             raise SystemExit(0)
-        print(f"Malformed digest for {asset_name}", file=sys.stderr)
+        print(f"Malformed digest for {asset_name}: {digest!r}", file=sys.stderr)
         raise SystemExit(1)
 print(f"Asset not found: {asset_name}", file=sys.stderr)
 raise SystemExit(1)
@@ -100,7 +100,12 @@ ARCH="$ARCH" APPIMAGE_EXTRACT_AND_RUN=1 "$LINUXDEPLOY_TOOL" \
     --executable "$APPDIR/usr/bin/giada" \
     --output appimage
 
-GENERATED_APPIMAGE="$(ls -1 ./*.AppImage | head -n 1)"
+GENERATED_APPIMAGE="$(find . -maxdepth 1 -type f -name '*.AppImage' | head -n 1)"
+if [ -z "$GENERATED_APPIMAGE" ]; then
+    echo "linuxdeploy did not produce an AppImage"
+    exit 1
+fi
+
 mv "$GENERATED_APPIMAGE" "$OUTPUT"
 
 APPIMAGE_SIZE=$(stat -c%s "$OUTPUT") || {
