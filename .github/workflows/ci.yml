@@ -28,6 +28,42 @@ jobs:
       - name: Run tests
         run: xvfb-run ./build/giada --run-tests
 
+  linux-appimage:
+    name: Linux AppImage (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-20.04
+          - arch: aarch64
+            runner: ubuntu-22.04-arm
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: bash ./.github/scripts/linux/install-deps.sh
+
+      - name: Generate Makefile
+        run: cmake -S . -B build/ -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_VST3=ON
+
+      - name: Build
+        run: cmake --build build/ -j 3
+
+      - name: Make AppImage
+        run: bash ./.github/scripts/linux/make-appimage.sh ${{ github.ref_name }} ${{ matrix.arch }}
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: giada-${{ matrix.arch }}-appimage
+          path: dist/giada-*-linux.AppImage
+
   # Windows --------------------------------------------------------------------
   windows:
     name: Windows
