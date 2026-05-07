@@ -22,7 +22,15 @@ fi
 rm -rf dist temp
 mkdir -p dist "$APPDIR"
 
-cmake --install build/ --prefix "$APPDIR/usr"
+mkdir -p "$APPDIR/usr/bin"
+mkdir -p "$APPDIR/usr/share/applications"
+mkdir -p "$APPDIR/usr/share/metainfo"
+mkdir -p "$APPDIR/usr/share/icons/hicolor/scalable/apps"
+
+cp build/giada "$APPDIR/usr/bin/giada"
+cp extras/com.giadamusic.Giada.desktop "$APPDIR/usr/share/applications/"
+cp extras/com.giadamusic.Giada.metainfo.xml "$APPDIR/usr/share/metainfo/"
+cp extras/giada-logo.svg "$APPDIR/usr/share/icons/hicolor/scalable/apps/com.giadamusic.Giada.svg"
 
 cat << 'EOF' > "$APPDIR/AppRun"
 #!/bin/sh
