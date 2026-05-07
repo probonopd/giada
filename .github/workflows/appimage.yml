@@ -1,0 +1,135 @@
+name: Continuous integration
+
+# Runs on push and pull requests on any branch.
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  # Linux ----------------------------------------------------------------------
+  linux:
+    name: Linux CI
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install dependencies
+        run: bash ./.github/scripts/linux/install-deps.sh
+
+      - name: Ensure vcpkg baseline is available
+        run: |
+          BASELINE="$(python3 -c 'import json; print(json.load(open("vcpkg.json"))["builtin-baseline"])')"
+          git -C "$VCPKG_INSTALLATION_ROOT" fetch --depth=1 origin "$BASELINE" || {
+            echo "Failed to fetch vcpkg builtin-baseline commit: $BASELINE"
+            exit 1
+          }
+
+      - name: Generate Makefile
+        run: cmake -S . -B build/ -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Debug -DWITH_TESTS=ON -DWITH_VST3=ON
+
+      - name: Build
+        run: cmake --build build/ -j 3
+
+      - name: Run tests
+        run: xvfb-run ./build/giada --run-tests
+
+  linux-appimage:
+    name: Linux AppImage (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+            cc: gcc
+            cxx: g++
+          # Oldest currently available Ubuntu arm64 hosted runner label.
+          - arch: aarch64
+            runner: ubuntu-22.04-arm
+            cc: gcc-13
+            cxx: g++-13
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install dependencies
+        run: bash ./.github/scripts/linux/install-deps.sh
+
+      - name: Ensure vcpkg baseline is available
+        run: |
+          BASELINE="$(python3 -c 'import json; print(json.load(open("vcpkg.json"))["builtin-baseline"])')"
+          git -C "$VCPKG_INSTALLATION_ROOT" fetch --depth=1 origin "$BASELINE" || {
+            echo "Failed to fetch vcpkg builtin-baseline commit: $BASELINE"
+            exit 1
+          }
+
+      - name: Generate Makefile
+        run: cmake -S . -B build/ -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_C_COMPILER=${{ matrix.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_VST3=ON
+
+      - name: Build
+        run: cmake --build build/ -j 3
+
+      - name: Make AppImage
+        run: bash ./.github/scripts/linux/make-appimage.sh ${{ github.sha }} ${{ matrix.arch }}
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: giada-${{ matrix.arch }}-appimage
+          path: dist/giada-*-linux.AppImage
+
+  # Windows --------------------------------------------------------------------
+  windows:
+    name: Windows
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Generate Makefile
+        shell: bash
+        run: cmake -S . -B build/ -G "Visual Studio 17 2022" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DWITH_TESTS=ON -DWITH_VST3=ON
+
+      - name: Build
+        shell: bash
+        run: cmake --build build/ --config Debug -j 3
+
+      - name: Run tests
+        run: ./build/Debug/giada.exe --run-tests
+
+  # macOS ----------------------------------------------------------------------
+  macos:
+    name: macOS
+    runs-on: macOS-14
+    timeout-minutes: 60
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Generate Makefile
+        run: cmake -S . -B build/ -G "Xcode" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_FLAGS="-x objective-c++" -DWITH_TESTS=ON -DWITH_VST3=ON
+
+      - name: Build
+        run: cmake --build build/ --config Debug -j 2
+
+      - name: Run tests
+        run: ./build/Debug/giada --run-tests

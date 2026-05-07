@@ -20,9 +20,15 @@
         },
         {
             "name": "libsndfile",
+            "platform": "!arm & !arm64",
             "features": [
                 "external-libs"
             ]
+        },
+        {
+            "name": "libsndfile",
+            "platform": "arm | arm64",
+            "default-features": false
         }
     ],
     "overrides": [
@@ -49,6 +55,10 @@
         {
             "name": "libsndfile",
             "version": "1.2.2"
+        },
+        {
+            "name": "alsa",
+            "version": "1.2.15.3"
         }
     ]
 }
