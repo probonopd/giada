@@ -1,0 +1,165 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 63a3ca443fab9494f7145771496b8add2c2ce38249c0faef827f6a4202bf4457
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 8f2153eb6dcca270e064868ddd3737879fc1f23daa19d7e655e2344ecc321fd9
+Status: install ok installed
+
+Package: catch2
+Version: 3.11.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 769e27e71f81f1124352a3f9723870974beccffbf67c57b8e0e6a718ec2ebe8c
+Description: A modern, C++-native, test framework for unit-tests, TDD and BDD.
+Status: install ok installed
+
+Package: fmt
+Version: 12.0.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: dfaf212451be2169f2201eea77d212c8ba69b50a0f364d4fde885d43ba773715
+Description: {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
+Status: install ok installed
+
+Package: libsamplerate
+Version: 0.2.2
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 63c946401a655cbb58c0a4ff0f72618abb56f92b2a201c0581e4c98aba1f53bc
+Description: Sample Rate Converter for audio
+Status: install ok installed
+
+Package: mpg123
+Version: 1.33.4
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: ad46f192bb089ff4f884b5900be0ece9421d5e0305741fa575fa7c077e2d6b51
+Description: mpg123 is a real time MPEG 1.0/2.0/2.5 audio player/decoder for layers 1, 2 and 3 (MPEG 1.0 layer 3 also known as MP3).
+Status: install ok installed
+
+Package: mp3lame
+Version: 3.100
+Port-Version: 16
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 7ca3fc57c0885c464f74c9089d6f80cc2a9393a11348b548ce2850a265cb4272
+Description: LAME is a high quality MPEG Audio Layer III (MP3) encoder licensed under the LGPL.
+Status: install ok installed
+
+Package: opus
+Version: 1.5.2
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 8a1b7e7038211cad927e76a6382580d8c3681602003d8eb569ef314df1ee1c99
+Description: Totally open, royalty-free, highly versatile audio codec
+Status: install ok installed
+
+Package: libogg
+Version: 1.3.6
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: c29c436674d79265047d9d62cf7dcdac827e735e0ac60baaf1fbce4264db4b7b
+Description: Ogg is a multimedia container format, and the native file and stream format for the Xiph.org multimedia codecs.
+Status: install ok installed
+
+Package: libvorbis
+Version: 1.3.7
+Port-Version: 4
+Depends: libogg, vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: b851f9a6fbfd458e27ad254ea805f94905e2e4f871b7a769d58d9777089bc202
+Description: Ogg Vorbis is a fully open, non-proprietary, patent-and-royalty-free, general-purpose compressed audio format
+Status: install ok installed
+
+Package: libflac
+Version: 1.5.0
+Depends: libogg, vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: d7328f580496b6eaad3eb4772758f9093837da6becda2faf69526d5a289462ba
+Description: Library for manipulating FLAC files
+Default-Features: stack-protector
+Status: install ok installed
+
+Package: libflac
+Feature: stack-protector
+Architecture: x64-linux
+Multi-Arch: same
+Description: Build with stack smashing protection
+Status: install ok installed
+
+Package: libsndfile
+Version: 1.2.2
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: fef960d532cb686eab6724065aa5680fbdecb33604e442bc8230f65419cefe65
+Description: A library for reading and writing audio files
+Default-Features: external-libs, mpeg
+Status: install ok installed
+
+Package: libsndfile
+Feature: external-libs
+Depends: libflac, libvorbis, opus
+Architecture: x64-linux
+Multi-Arch: same
+Description: Enable FLAC, Vorbis, and Opus codecs
+Status: install ok installed
+
+Package: libsndfile
+Feature: mpeg
+Depends: mp3lame, mpg123
+Architecture: x64-linux
+Multi-Arch: same
+Description: Enable MPEG codecs
+Status: install ok installed
+
+Package: nlohmann-json
+Version: 3.12.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 017dc3b5425d1eeae7c8749771a1e429806cee1d834b1b9f18c068d558166f6f
+Description: JSON for Modern C++
+Status: install ok installed
+
+Package: alsa
+Version: 1.2.15.3
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 14334df562e8455715871fe5bd312cc2f60dfefbc0a80de49cc670a9838909c2
+Description: The Advanced Linux Sound Architecture (ALSA) - library
+Status: install ok installed
+
+Package: rtmidi
+Version: 6.0.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 0109720954e6d35cb528755be4e5c404a32ce054702623461a0c039146680713
+Description: A set of C++ classes that provide a common API for realtime MIDI input/output across Linux (ALSA & JACK), Macintosh OS X (CoreMidi & JACK) and Windows (Multimedia)
+Status: install ok installed
+
+Package: rtmidi
+Feature: alsa
+Depends: alsa
+Architecture: x64-linux
+Multi-Arch: same
+Description: Build ALSA API
+Status: install ok installed
+

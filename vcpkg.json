@@ -20,9 +20,15 @@
         },
         {
             "name": "libsndfile",
+            "platform": "!arm",
             "features": [
                 "external-libs"
             ]
+        },
+        {
+            "name": "libsndfile",
+            "platform": "arm",
+            "default-features": false
         }
     ],
     "overrides": [
