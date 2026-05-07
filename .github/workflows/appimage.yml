@@ -25,10 +25,8 @@ jobs:
 
       - name: Ensure vcpkg baseline is available
         run: |
-          if [ -f "$VCPKG_INSTALLATION_ROOT/.git/shallow" ]; then
-            git -C "$VCPKG_INSTALLATION_ROOT" fetch --unshallow
-          fi
-          git -C "$VCPKG_INSTALLATION_ROOT" fetch --tags --force --prune origin
+          BASELINE="$(python3 -c 'import json; print(json.load(open("vcpkg.json"))["builtin-baseline"])')"
+          git -C "$VCPKG_INSTALLATION_ROOT" fetch --depth=1 origin "$BASELINE"
 
       - name: Generate Makefile
         run: cmake -S . -B build/ -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Debug -DWITH_TESTS=ON -DWITH_VST3=ON
@@ -64,10 +62,8 @@ jobs:
 
       - name: Ensure vcpkg baseline is available
         run: |
-          if [ -f "$VCPKG_INSTALLATION_ROOT/.git/shallow" ]; then
-            git -C "$VCPKG_INSTALLATION_ROOT" fetch --unshallow
-          fi
-          git -C "$VCPKG_INSTALLATION_ROOT" fetch --tags --force --prune origin
+          BASELINE="$(python3 -c 'import json; print(json.load(open("vcpkg.json"))["builtin-baseline"])')"
+          git -C "$VCPKG_INSTALLATION_ROOT" fetch --depth=1 origin "$BASELINE"
 
       - name: Generate Makefile
         run: cmake -S . -B build/ -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_VST3=ON
