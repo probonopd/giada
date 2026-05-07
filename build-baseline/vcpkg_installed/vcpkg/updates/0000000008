@@ -1,0 +1,7 @@
+Package: libsamplerate
+Version: 0.2.2
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 63c946401a655cbb58c0a4ff0f72618abb56f92b2a201c0581e4c98aba1f53bc
+Description: Sample Rate Converter for audio
+Status: install ok half-installed

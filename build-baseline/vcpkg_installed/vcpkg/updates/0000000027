@@ -1,0 +1,9 @@
+Package: libsndfile
+Version: 1.2.2
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: fef960d532cb686eab6724065aa5680fbdecb33604e442bc8230f65419cefe65
+Description: A library for reading and writing audio files
+Default-Features: external-libs, mpeg
+Status: install ok installed

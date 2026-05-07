@@ -1,0 +1,8 @@
+Package: mp3lame
+Version: 3.100
+Port-Version: 16
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 7ca3fc57c0885c464f74c9089d6f80cc2a9393a11348b548ce2850a265cb4272
+Description: LAME is a high quality MPEG Audio Layer III (MP3) encoder licensed under the LGPL.
+Status: install ok half-installed
