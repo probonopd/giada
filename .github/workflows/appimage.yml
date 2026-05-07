@@ -47,9 +47,13 @@ jobs:
         include:
           - arch: x86_64
             runner: ubuntu-20.04
+            cc: gcc
+            cxx: g++
           # Oldest currently available Ubuntu arm64 hosted runner label.
           - arch: aarch64
             runner: ubuntu-22.04-arm
+            cc: gcc-13
+            cxx: g++-13
     steps:
       - name: Download repository
         uses: actions/checkout@v4
@@ -66,7 +70,7 @@ jobs:
           git -C "$VCPKG_INSTALLATION_ROOT" fetch --depth=1 origin "$BASELINE"
 
       - name: Generate Makefile
-        run: cmake -S . -B build/ -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_VST3=ON
+        run: cmake -S . -B build/ -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_C_COMPILER=${{ matrix.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} -DCMAKE_BUILD_TYPE=Release -DWITH_TESTS=OFF -DWITH_VST3=ON
 
       - name: Build
         run: cmake --build build/ -j 3
