@@ -41,6 +41,7 @@ jobs:
         include:
           - arch: x86_64
             runner: ubuntu-20.04
+          # Oldest currently available Ubuntu arm64 hosted runner label.
           - arch: aarch64
             runner: ubuntu-22.04-arm
     steps:

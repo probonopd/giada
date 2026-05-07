@@ -61,19 +61,23 @@ for asset in release.get("assets", []):
         if digest.startswith("sha256:"):
             print(digest.split(":", 1)[1])
             raise SystemExit(0)
-print("")
-' "$ARCH" <<< "$RELEASE_JSON")"
-
-if [ -z "$EXPECTED_DIGEST" ]; then
+        print(f"Malformed digest for {asset_name}", file=sys.stderr)
+        raise SystemExit(1)
+print(f"Asset not found: {asset_name}", file=sys.stderr)
+raise SystemExit(1)
+' "$ARCH" <<< "$RELEASE_JSON")" || {
     echo "Unable to determine appimagetool digest for $ARCH"
     exit 1
-fi
+}
 
 curl -fSL -o "$APPIMAGE_TOOL" "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${ARCH}.AppImage" || {
     echo "Failed to download appimagetool for $ARCH"
     exit 1
 }
-DOWNLOADED_DIGEST="$(sha256sum "$APPIMAGE_TOOL" | awk '{print $1}')"
+DOWNLOADED_DIGEST="$(sha256sum "$APPIMAGE_TOOL" | awk '{print $1}')" || {
+    echo "Failed to calculate digest for downloaded appimagetool"
+    exit 1
+}
 if [ "$DOWNLOADED_DIGEST" != "$EXPECTED_DIGEST" ]; then
     echo "appimagetool digest mismatch for $ARCH"
     echo "expected: $EXPECTED_DIGEST"
