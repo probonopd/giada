@@ -53,10 +53,10 @@ arch=sys.argv[1]
 asset_name=f"appimagetool-{arch}.AppImage"
 release=json.load(sys.stdin)
 for asset in release.get("assets", []):
-    if asset.get("name")==asset_name:
-        digest=asset.get("digest","")
+    if asset.get("name") == asset_name:
+        digest = asset.get("digest", "")
         if digest.startswith("sha256:"):
-            print(digest.split(":",1)[1])
+            print(digest.split(":", 1)[1])
             raise SystemExit(0)
 print("")
 ' "$ARCH" <<< "$RELEASE_JSON")"
