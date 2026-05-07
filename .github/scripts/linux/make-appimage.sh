@@ -7,7 +7,7 @@ if [ -z "${1:-}" ] || [ -z "${2:-}" ]; then
     exit 1
 fi
 
-RELEASE_VERSION="${1//\//-}"
+RELEASE_VERSION="$(echo "$1" | tr -cs '[:alnum:]._-+' '-')"
 ARCH="$2"
 APPDIR="temp/AppDir"
 APPIMAGE_TOOL="temp/appimagetool.AppImage"
