@@ -2,7 +2,7 @@ name: Continuous integration
 
 # Runs on push and pull requests, any branch, Linux only (for now).
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 permissions:
   contents: read
